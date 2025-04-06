@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos | GestãoVest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-tshirt text-2xl text-gray-800"></i>
+                <h1 class="text-xl font-bold text-gray-800">GestãoVest</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="index.html" class="text-gray-500 font-medium hover:text-blue-600">Início</a></li>
+                    <li><a href="producao.html" class="text-gray-500 font-medium hover:text-blue-600">Produção</a></li>
+                    <li><a href="estoque.html" class="text-gray-500 font-medium hover:text-blue-600">Estoque</a></li>
+                    <li><a href="pedidos.html" class="text-blue-600 font-medium">Pedidos</a></li>
+                    <li><a href="financeiro.html" class="text-gray-500 font-medium hover:text-blue-600">Financeiro</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-800">Gestão de Pedidos</h2>
+            <button onclick="toggleOrderForm()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-plus mr-2"></i> Novo Pedido
+            </button>
+        </div>
+
+        <!-- Add Order Form (Hidden by default) -->
+        <div id="addOrderForm" class="hidden bg-white p-6 rounded-lg shadow-sm mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Criar Novo Pedido</h3>
+            <form id="orderForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                        <input type="text" id="customerName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="orderDate" class="block text-sm font-medium text-gray-700 mb-1">Data do Pedido</label>
+                        <input type="date" id="orderDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="deliveryDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Entrega</label>
+                        <input type="date" id="deliveryDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="orderStatus" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="orderStatus" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="pendente">Pendente</option>
+                            <option value="processando">Processando</option>
+                            <option value="enviado">Enviado</option>
+                            <option value="entregue">Entregue</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="mt-6">
+                    <h4 class="text-lg font-medium text-gray-800 mb-3">Itens do Pedido</h4>
+                    <div id="orderItemsContainer">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Item</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Camiseta Básica Branca</option>
+                                    <option>Camiseta Estampada</option>
+                                    <option>Calça Jeans</option>
+                                    <option>Vestido Floral</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                                <input type="number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preço Unitário</label>
+                                <input type="number" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="button" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addOrderItem()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <i class="fas fa-plus mr-1"></i> Adicionar Item
+                    </button>
+                </div>
+
+                <div class="mt-6">
+                    <label for="orderNotes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                    <textarea id="orderNotes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="button" onclick="toggleOrderForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Salvar Pedido</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Orders Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pedidos Hoje</p>
+                        <p class="text-3xl font-bold text-gray-800 mt-2">5</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-calendar-day text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pendentes</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-2">3</p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Enviados</p>
+                        <p class="text-3xl font-bold text-green-600 mt-2">7</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-truck text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Valor Total</p>
+                        <p class="text-3xl font-bold text-gray-800 mt-2">R$ 2.450</p>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nº Pedido</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Itens</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="ordersTable">
+                        <!-- Sample data - would be populated from JS in a real app -->
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">#1001</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">Loja Moda Jovem</div>
+                                <div class="text-sm text-gray-500">contato@modajovem.com.br</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">15/10/2023</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">3</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">R$ 450,00</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pendente</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Editar</a>
+                                <a href="#" class="text-red-600 hover:text-red-900">Excluir</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">#1000</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">Boutique Elegância</div>
+                                <div class="text-sm text-gray-500">vendas@boutiqueeleg.com.br</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">14/10/2023</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">5</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">R$ 780,00</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Enviado</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Editar</a>
+                                <a href="#" class="text-red-600 hover:text-red-900">Excluir</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">#999</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">Atacado Moda Plus</div>
+                                <div class="text-sm text-gray-500">compras@modaplus.com.br</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">12/10/2023</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">10</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">R$ 1.220,00</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Processando</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Editar</a>
+                                <a href="#" class="text-red-600 hover:text-red-900">Excluir</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-tshirt text-2xl"></i>
+                        <h2 class="text-xl font-bold">GestãoVest</h2>
+                    </div>
+                    <p class="mt-2 text-gray-400">Soluções para gestão de startups de vestuário</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-blue-400"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="hover:text-blue-400"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-blue-400"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 GestãoVest. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleOrderForm() {
+            const form = document.getElementById('addOrderForm');
+            form.classList.toggle('hidden');
+        }
+
+        function addOrderItem() {
+            const container = document.getElementById('orderItemsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'grid grid-cols-1 md:grid-cols-4 gap-4 mb-4';
+            newItem.innerHTML = `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Item</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option>Camiseta Básica Branca</option>
+                        <option>Camiseta Estampada</option>
+                        <option>Calça Jeans</option>
+                        <option>Vestido Floral</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                    <input type="number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Preço Unitário</label>
+                    <input type="number" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="flex items-end">
+                    <button type="button" onclick="this.parentNode.parentNode.remove()" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newItem);
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const customer = document.getElementById('customerName').value;
+            const date = document.getElementById('orderDate').value;
+            const status = document.getElementById('orderStatus').value;
+            
+            // Create new table row
+            const table = document.getElementById('ordersTable');
+            const newRow = document.createElement('tr');
+            
+            // Status badge color
+            let statusClass, statusText;
+            if (status === 'pendente') {
+                statusClass = 'bg-yellow-100 text-yellow-800';
+                statusText = 'Pendente';
+            } else if (status === 'processando') {
+                statusClass = 'bg-blue-100 text-blue-800';
+                statusText = 'Processando';
+            } else if (status === 'enviado') {
+                statusClass = 'bg-green-100 text-green-800';
+                statusText = 'Enviado';
+            } else if (status === 'entregue') {
+                statusClass = 'bg-purple-100 text-purple-800';
+                statusText = 'Entregue';
+            } else {
+                statusClass = 'bg-red-100 text-red-800';
+                statusText = 'Cancelado';
+            }
+            
+            // Format date
+            const formattedDate = new Date(date).toLocaleDateString('pt-BR');
+            
+            newRow.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">#${Math.floor(1000 + Math.random() * 9000)}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${customer}</div>
+                    <div class="text-sm text-gray-500">email@exemplo.com</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${formattedDate}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${Math.floor(1 + Math.random() * 10)}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">R$ ${(Math.random() * 1000 + 100).toFixed(2).replace('.', ',')}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Editar</a>
+                    <a href="#" class="text-red-600 hover:text-red-900">Excluir</a>
+                </td>
+            `;
+            
+            // Add row to table
+            table.appendChild(newRow);
+            
+            // Reset form
+            this.reset();
+            toggleOrderForm();
+            
+            // Show success message
+            alert('Pedido criado com sucesso!');
+        });
+    </script>
+</body>
+</html>
